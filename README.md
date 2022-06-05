@@ -21,7 +21,7 @@
 |domain name|你的域名|
 
 ```shell
-# curl -fsSL https://raw.githubusercontent.com/windshadow233/ws-tls-nginx/main/install.sh | bash
+bash <(curl -fsSL https://raw.githubusercontent.com/windshadow233/ws-tls-nginx/main/install.sh)
 ```
 
 该脚本中途使用Let's Encrypt生成证书，需要每隔三个月续签一次。
