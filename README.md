@@ -16,7 +16,7 @@
 
 |参数|说明|
 |:-:|:-:|
-|v2ray port|V2Ray的监听端口，用以与服务器本地的Nginx通信|
+|v2ray port|V2Ray的监听端口，用以与服务器本地的Nginx通信，如无冲突则不需要改|
 |nginx port|Nginx服务对外开放的端口，也即客户端与服务器通信的端口|
 |domain name|你的域名|
 
