@@ -75,6 +75,7 @@ else
 fi
 
 echo "Writing v2ray config..."
+path=`cat /dev/urandom | head -n 10 | md5sum | head -c 8`
 cat>/usr/local/etc/v2ray/config.json<<EOF
 {
   "log":{
@@ -96,7 +97,7 @@ cat>/usr/local/etc/v2ray/config.json<<EOF
       "streamSettings": {
         "network": "ws",
         "wsSettings": {
-          "path": "/v2ray"
+          "path": "/$path"
         }
       }
     }
@@ -135,7 +136,7 @@ server {
   ssl_protocols         TLSv1 TLSv1.1 TLSv1.2;
   ssl_ciphers           HIGH:!aNULL:!MD5;
   server_name           $domainName;
-  location /v2ray {
+  location /$path {
     proxy_redirect off;
     proxy_pass http://127.0.0.1:$v2rayPort;
     proxy_http_version 1.1;
@@ -170,5 +171,5 @@ systemctl enable v2ray
 systemctl enable nginx
 ufw allow $nginxPort
 echo "Finish! V2Ray config file is at: /usr/local/etc/v2ray/config.json and Nginx config file is at: /etc/nginx/conf.d/v2ray.conf."
-infoStr=`echo "{\"v\": \"2\", \"ps\": \"$domainName\", \"add\": \"$domainName\", \"port\": \"$nginxPort\", \"id\": \"$uuid\", \"aid\": \"0\", \"net\": \"ws\", \"type\": \"none\", \"host\": \"\", \"path\": \"/v2ray\", \"tls\": \"true\", \"sni\": \"\"}" | base64 -w 0`
+infoStr=`echo "{\"v\": \"2\", \"ps\": \"$domainName\", \"add\": \"$domainName\", \"port\": \"$nginxPort\", \"id\": \"$uuid\", \"aid\": \"0\", \"net\": \"ws\", \"type\": \"none\", \"host\": \"\", \"path\": \"/$path\", \"tls\": \"true\", \"sni\": \"\"}" | base64 -w 0`
 echo -e "Import the link shown below to your client software: \n\nvmess://$infoStr"
