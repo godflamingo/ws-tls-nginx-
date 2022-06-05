@@ -75,7 +75,7 @@ else
 fi
 
 echo "Writing v2ray config..."
-path=`cat /dev/urandom | head -n 10 | md5sum | head -c 8`
+path=`cat /dev/urandom | head -n 10 | md5sum | head -c 5`
 cat>/usr/local/etc/v2ray/config.json<<EOF
 {
   "log":{
@@ -171,5 +171,5 @@ systemctl enable v2ray
 systemctl enable nginx
 ufw allow $nginxPort
 echo "Finish! V2Ray config file is at: /usr/local/etc/v2ray/config.json and Nginx config file is at: /etc/nginx/conf.d/v2ray.conf."
-infoStr=`echo "{\"v\": \"2\", \"ps\": \"$domainName\", \"add\": \"$domainName\", \"port\": \"$nginxPort\", \"id\": \"$uuid\", \"aid\": \"0\", \"net\": \"ws\", \"type\": \"none\", \"host\": \"\", \"path\": \"/$path\", \"tls\": \"true\", \"sni\": \"\"}" | base64 -w 0`
+infoStr=`echo "{\"v\": \"2\", \"ps\": \"$domainName\", \"add\": \"$domainName\", \"port\": \"$nginxPort\", \"id\": \"$uuid\", \"aid\": \"0\", \"net\": \"ws\", \"type\": \"none\", \"host\": \"\", \"path\": \"/$path\", \"tls\": \"tls\", \"sni\": \"\"}" | base64 -w 0`
 echo -e "Import the link shown below to your client software: \n\nvmess://$infoStr"
