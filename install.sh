@@ -5,7 +5,7 @@ if [ "$current_user" != "root" ]; then
   echo "Please run this script with root privileges!"
   exit
 fi
-read -p "Enter v2ray port (default: 12345):" v2rayPort
+read -p "Enter v2ray port (default: 12345; Just keep the default value if there is no port conflict):" v2rayPort
 v2rayPort=${v2rayPort:-12345}
 
 read -p "Enter nginx port (default: 443):" nginxPort
