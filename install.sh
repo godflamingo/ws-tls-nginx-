@@ -13,8 +13,8 @@ nginxPort=${nginxPort:-443}
 
 read -p "Enter your domain name (required):" domainName
 if [ ! -n "$domainName" ]; then
-    echo "Domain name is required!"
-    exit
+  echo "Domain name is required!"
+  exit
 fi
 if [ "$(lsof -i:$v2rayPort)" -o "$(lsof -i:$nginxPort)" ]; then
   echo "Port $v2rayPort or $nginxPort is not available."
