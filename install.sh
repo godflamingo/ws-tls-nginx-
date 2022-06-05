@@ -1,7 +1,6 @@
 #!/bin/bash
 
-current_user=$(whoami)
-if [ "$current_user" != "root" ]; then
+if [ `whoami` != "root" ]; then
   echo "Please run this script with root privileges!"
   exit
 fi
