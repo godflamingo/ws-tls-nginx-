@@ -131,7 +131,7 @@ EOF
 echo -e "Writing nginx config...\n"
 cat>/etc/nginx/conf.d/v2ray.conf<<EOF
 server {
-  listen  $nginxPort ssl;
+  listen $nginxPort ssl;
   ssl on;
   ssl_certificate       /etc/letsencrypt/live/$domainName/fullchain.pem;
   ssl_certificate_key   /etc/letsencrypt/live/$domainName/privkey.pem;
@@ -154,7 +154,7 @@ EOF
 
 echo -e "Fetching SSL certificates...\n"
 ufw allow 80
-echo -e 'A' | certbot certonly --register-unsafely-without-email --webroot --preferred-challenges http -d $domainName
+certbot certonly --register-unsafely-without-email --webroot -w /var/www/html --preferred-challenges http -d $domainName
 ufw deny 80
 
 certificates=`certbot certificates | grep $domainName`
