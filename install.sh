@@ -19,11 +19,12 @@ if [ "$(lsof -i:$v2rayPort)" -o "$(lsof -i:$nginxPort)" ]; then
   echo "Port $v2rayPort or $nginxPort is not available."
   exit
 fi
-
-read -p "Your domain name has already resolved to the IP address of this server [y/n] " input
+echo -e "\nThe result of 'nslookup $domainName': \n\n"
+nslookup $domainName
+read -p "Your domain name has already resolved to the IP address of this server? [y/n] " input
 case $input in
   [yY]*)
-    echo "Great! Let's continue."
+    echo "Great! Let's continue.\n"
     ;;
   [nN]*)
     echo "Please set a DNS resolution to point the domain name to the IP address of this server."
@@ -37,44 +38,45 @@ case $input in
 esac
 
 uuid=`cat /proc/sys/kernel/random/uuid`
-apt-get update
+echo -e "Waiting for 'apt-get update'...\n"
+apt-get update -qq
 if [ ! "$(command -v v2ray)" ]; then
-  echo "Installing V2Ray..."
+  echo -e "Installing V2Ray...\n"
   bash <(curl -L https://raw.githubusercontent.com/v2fly/fhs-install-v2ray/master/install-release.sh)
 fi
 
 if [ "$(command -v v2ray)" ]; then
-  echo "V2Ray installed."
+  echo -e "V2Ray installed.\n"
 else
   echo "V2Ray installation has failed, please check."
   exit
 fi
 
 if [ ! "$(command -v nginx)" ]; then
-  echo "Installing Nginx..."
-  apt-get -y install nginx
+  echo -e "Installing Nginx...\n"
+  apt-get -yqq install nginx
 fi
 
 if [ "$(command -v nginx)" ]; then
-  echo "Nginx installed."
+  echo -e "Nginx installed.\n"
 else
   echo "Nginx installation has failed, please check."
   exit
 fi
 
 if [ ! "$(command -v certbot)" ]; then
-  echo "Installing Certbot..."
-  apt-get -y install certbot
+  echo -e "Installing Certbot...\n"
+  apt-get -yqq install certbot
 fi
 
 if [ "$(command -v certbot)" ]; then
-  echo "Certbot installed."
+  echo -e "Certbot installed.\n"
 else
   echo "Certbot installation has failed, please check."
   exit
 fi
 
-echo "Writing v2ray config..."
+echo -e "Writing v2ray config...\n"
 path=`cat /dev/urandom | head -n 10 | md5sum | head -c 5`
 cat>/usr/local/etc/v2ray/config.json<<EOF
 {
@@ -126,7 +128,7 @@ cat>/usr/local/etc/v2ray/config.json<<EOF
 }
 EOF
 
-echo "Writing nginx config..."
+echo -e "Writing nginx config...\n"
 cat>/etc/nginx/conf.d/v2ray.conf<<EOF
 server {
   listen  $nginxPort ssl;
@@ -150,26 +152,26 @@ server {
 }
 EOF
 
-echo "Fetching SSL certificates..."
+echo -e "Fetching SSL certificates...\n"
 ufw allow 80
 echo -e 'A' | certbot certonly --register-unsafely-without-email --webroot --preferred-challenges http -d $domainName
 ufw deny 80
 
 certificates=`certbot certificates | grep $domainName`
 if [ "$certificates" ]; then
-  echo "Certificates installed successfully!"
+  echo -e "Certificates installed successfully!\n"
 else
   echo "Certificates installation failed, please check."
   exit
 fi
 
-echo "Restarting all services..."
+echo -e "Restarting all services...\n"
 systemctl daemon-reload
 systemctl restart v2ray
 systemctl restart nginx
 systemctl enable v2ray
 systemctl enable nginx
 ufw allow $nginxPort
-echo "Finish! V2Ray config file is at: /usr/local/etc/v2ray/config.json and Nginx config file is at: /etc/nginx/conf.d/v2ray.conf."
+echo -e "Finish! \nV2Ray config file is at: /usr/local/etc/v2ray/config.json\nNginx config file is at: /etc/nginx/conf.d/v2ray.conf\n"
 infoStr=`echo "{\"v\": \"2\", \"ps\": \"$domainName\", \"add\": \"$domainName\", \"port\": \"$nginxPort\", \"id\": \"$uuid\", \"aid\": \"0\", \"net\": \"ws\", \"type\": \"none\", \"host\": \"\", \"path\": \"/$path\", \"tls\": \"tls\", \"sni\": \"\"}" | base64 -w 0`
 echo -e "Import the link shown below to your client software: \n\nvmess://$infoStr"
