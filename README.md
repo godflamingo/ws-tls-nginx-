@@ -1,6 +1,6 @@
-# 科学上网自建VPS（WebSocket + TLS + Nginx）脚本
+# 科学上网自建VPS（Vmess + WebSocket + TLS + Nginx）脚本
 
-关于通过WebSocket + TLS + Nginx方式进行科学上网的原理请自行谷歌。
+关于通过Vmess + WebSocket + TLS + Nginx方式进行科学上网的原理请自行谷歌。
 
 为方便以后使用，随意写了一个安装脚本。
 
