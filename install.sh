@@ -48,19 +48,7 @@ fi
 if [ "$(command -v v2ray)" ]; then
   echo -e "V2Ray installed.\n"
 else
-  echo "V2Ray installation has failed, please check."
-  exit
-fi
-
-if [ ! "$(command -v nginx)" ]; then
-  echo -e "Installing Nginx...\n"
-  apt-get -yqq install nginx
-fi
-
-if [ "$(command -v nginx)" ]; then
-  echo -e "Nginx installed.\n"
-else
-  echo "Nginx installation has failed, please check."
+  echo "V2Ray installation failed, please check."
   exit
 fi
 
@@ -72,7 +60,19 @@ fi
 if [ "$(command -v certbot)" ]; then
   echo -e "Certbot installed.\n"
 else
-  echo "Certbot installation has failed, please check."
+  echo "Certbot installation failed, please check."
+  exit
+fi
+
+if [ ! "$(command -v nginx)" ]; then
+  echo -e "Installing Nginx...\n"
+  apt-get -yqq install nginx
+fi
+
+if [ "$(command -v nginx)" ]; then
+  echo -e "Nginx installed.\n"
+else
+  echo "Nginx installation failed, please check."
   exit
 fi
 
@@ -128,6 +128,19 @@ cat>/usr/local/etc/v2ray/config.json<<EOF
 }
 EOF
 
+echo -e "Fetching SSL certificates...\n"
+ufw allow 80
+echo -e 'A' | certbot certonly --register-unsafely-without-email --webroot -w /var/www/html --preferred-challenges http -d $domainName
+ufw deny 80
+
+certificates=`certbot certificates | grep $domainName`
+if [ "$certificates" ]; then
+  echo -e "Certificates were installed successfully!\n"
+else
+  echo "Certificates installation failed, please check."
+  exit
+fi
+
 echo -e "Writing nginx config...\n"
 cat>/etc/nginx/conf.d/v2ray.conf<<EOF
 server {
@@ -151,19 +164,6 @@ server {
   }
 }
 EOF
-
-echo -e "Fetching SSL certificates...\n"
-ufw allow 80
-echo -e 'A' | certbot certonly --register-unsafely-without-email --webroot -w /var/www/html --preferred-challenges http -d $domainName
-ufw deny 80
-
-certificates=`certbot certificates | grep $domainName`
-if [ "$certificates" ]; then
-  echo -e "Certificates installed successfully!\n"
-else
-  echo "Certificates installation failed, please check."
-  exit
-fi
 
 echo -e "Restarting all services...\n"
 systemctl daemon-reload
