@@ -154,7 +154,7 @@ EOF
 
 echo -e "Fetching SSL certificates...\n"
 ufw allow 80
-certbot certonly --register-unsafely-without-email --webroot -w /var/www/html --preferred-challenges http -d $domainName
+echo -e 'A' | certbot certonly --register-unsafely-without-email --webroot -w /var/www/html --preferred-challenges http -d $domainName
 ufw deny 80
 
 certificates=`certbot certificates | grep $domainName`
