@@ -168,7 +168,6 @@ systemctl restart nginx
 systemctl enable v2ray
 systemctl enable nginx
 ufw allow $nginxPort
-echo "Finish! The config file is at: /usr/local/etc/v2ray/config.json"
+echo "Finish! V2Ray config file is at: /usr/local/etc/v2ray/config.json and Nginx config file is at: /etc/nginx/conf.d/v2ray.conf."
 infoStr=`echo "{\"v\": \"2\", \"ps\": \"$domainName\", \"add\": \"$domainName\", \"port\": \"$nginxPort\", \"id\": \"$uuid\", \"aid\": \"0\", \"net\": \"ws\", \"type\": \"none\", \"host\": \"\", \"path\": \"/v2ray\", \"tls\": \"true\", \"sni\": \"\"}" | base64 -w 0`
-echo "Import the link shown below to your client software: "
-echo "vmess://$infoStr"
+echo -e "Import the link shown below to your client software: \n\nvmess://$infoStr"
