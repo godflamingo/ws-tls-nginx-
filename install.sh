@@ -151,7 +151,9 @@ server {
 EOF
 
 echo "Fetching SSL certificates..."
-echo -e 'A' | certbot certonly --register-unsafely-without-email --webroot -d $domainName
+ufw allow 80
+echo -e 'A' | certbot certonly --register-unsafely-without-email --webroot --preferred-challenges http -d $domainName
+ufw deny 80
 
 certificates=`certbot certificates | grep $domainName`
 if [ "$certificates" ]; then
