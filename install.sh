@@ -24,7 +24,7 @@ nslookup $domainName
 read -p "Your domain name has already resolved to the IP address of this server? [y/n] " input
 case $input in
   [yY]*)
-    echo "Great! Let's continue.\n"
+    echo -e "Great! Let's continue.\n"
     ;;
   [nN]*)
     echo "Please set a DNS resolution to point the domain name to the IP address of this server."
