@@ -36,6 +36,27 @@ case $input in
     exit
     ;;
 esac
+
+if [ "$(lsof -i:80)" -o "$(lsof -i:443)" ]; then
+  echo "Port 80 or 443 is not available. You must free them first to run a standalone server."
+  exit
+fi
+
+echo "Fetching SSL certificates..."
+ufw allow 80
+ufw allow 443
+certbot certonly --register-unsafely-without-email --standalone -d $domainName
+ufw deny 80
+ufw deny 443
+
+certificates=`certbot certificates | grep $domainName`
+if [ "$certificates" ]; then
+  echo "Certificates installed successfully!"
+else
+  echo "Certificates installation failed, please check."
+  exit
+fi
+
 uuid=`cat /proc/sys/kernel/random/uuid`
 apt update
 if [ ! "$(command -v v2ray)" ]; then
@@ -71,26 +92,6 @@ if [ "$(command -v nginx)" ]; then
   echo "Nginx installed."
 else
   echo "Nginx installation has failed, please check."
-  exit
-fi
-
-if [ "$(lsof -i:80)" -o "$(lsof -i:443)" ]; then
-  echo "Port 80 or 443 is not available. You must free them first to run a standalone server."
-  exit
-fi
-
-echo "Fetching SSL certificates..."
-ufw allow 80
-ufw allow 443
-certbot certonly --register-unsafely-without-email --standalone -d $domainName
-ufw deny 80
-ufw deny 443
-
-certificates=`certbot certificates | grep $domainName`
-if [ "$certificates" ]; then
-  echo "Certificates installed successfully!"
-else
-  echo "Certificates installation failed, please check."
   exit
 fi
 
