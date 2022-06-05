@@ -46,7 +46,7 @@ if [ ! "$(command -v v2ray)" ]; then
 fi
 
 if [ "$(command -v v2ray)" ]; then
-  echo -e "V2Ray installed.\n"
+  echo -e "V2Ray was installed.\n"
 else
   echo "V2Ray installation failed, please check."
   exit
@@ -58,7 +58,7 @@ if [ ! "$(command -v certbot)" ]; then
 fi
 
 if [ "$(command -v certbot)" ]; then
-  echo -e "Certbot installed.\n"
+  echo -e "Certbot was installed.\n"
 else
   echo "Certbot installation failed, please check."
   exit
@@ -70,7 +70,7 @@ if [ ! "$(command -v nginx)" ]; then
 fi
 
 if [ "$(command -v nginx)" ]; then
-  echo -e "Nginx installed.\n"
+  echo -e "Nginx was installed.\n"
 else
   echo "Nginx installation failed, please check."
   exit
