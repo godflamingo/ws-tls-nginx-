@@ -16,6 +16,11 @@ if [ ! -n "$domainName" ]; then
     echo "Domain name is required!"
     exit
 fi
+if [ "$(lsof -i:$v2rayPort)" -o "$(lsof -i:$nginxPort)" ]; then
+  echo "Port $v2rayPort or $nginxPort is not available."
+  exit
+fi
+
 read -p "Your domain name has already resolved to the IP address of this server [y/n] " input
 case $input in
   [yY]*)
@@ -36,9 +41,60 @@ apt update
 if [ ! "$(command -v v2ray)" ]; then
   echo "Installing V2Ray..."
   bash <(curl -L https://raw.githubusercontent.com/v2fly/fhs-install-v2ray/master/install-release.sh)
-  echo "V2Ray Installed."
 fi
 
+if [ "$(command -v v2ray)" ]; then
+  echo "V2Ray installed."
+else
+  echo "V2Ray installation has failed, please check."
+  exit
+fi
+
+if [ ! "$(command -v certbot)" ]; then
+  echo "Installing Certbot..."
+  echo -e "Y" | apt install certbot
+fi
+
+if [ "$(command -v certbot)" ]; then
+  echo "Certbot installed."
+else
+  echo "Certbot installation has failed, please check."
+  exit
+fi
+
+if [ ! "$(command -v nginx)" ]; then
+  echo "Installing Nginx..."
+  echo -e "Y" | apt install nginx
+fi
+
+if [ "$(command -v nginx)" ]; then
+  echo "Nginx installed."
+else
+  echo "Nginx installation has failed, please check."
+  exit
+fi
+
+if [ "$(lsof -i:80)" -o "$(lsof -i:443)" ]; then
+  echo "Port 80 or 443 is not available. You must free them first to run a standalone server."
+  exit
+fi
+
+echo "Fetching SSL certificates..."
+ufw allow 80
+ufw allow 443
+certbot certonly --register-unsafely-without-email --standalone -d $domainName
+ufw deny 80
+ufw deny 443
+
+certificates=`certbot certificates | grep $domainName`
+if [ "$certificates" ]; then
+  echo "Certificates installed successfully!"
+else
+  echo "Certificates installation failed, please check."
+  exit
+fi
+
+echo "Writing v2ray config..."
 cat>/usr/local/etc/v2ray/config.json<<EOF
 {
   "log":{
@@ -88,21 +144,8 @@ cat>/usr/local/etc/v2ray/config.json<<EOF
   }
 }
 EOF
-if [ ! "$(command -v certbot)" ]; then
-  echo "Installing Certbot..."
-  echo -e "Y" | apt install certbot
-  echo "Certbot installed."
-fi
-ufw allow 443
-ufw allow 80
-certbot certonly --register-unsafely-without-email --standalone -d $domainName
-ufw deny 443
-ufw deny 80
-if [ ! "$(command -v nginx)" ]; then
-  echo "Installing Nginx..."
-  echo -e "Y" | apt install nginx
-  echo "Nginx Installed."
-fi
+
+echo "Writing nginx config..."
 cat>/etc/nginx/conf.d/v2ray.conf<<EOF
 server {
   listen  $nginxPort ssl;
@@ -125,6 +168,7 @@ server {
   }
 }
 EOF
+echo "Restarting all services..."
 systemctl daemon-reload
 systemctl restart v2ray
 systemctl restart nginx
