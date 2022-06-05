@@ -38,7 +38,7 @@ case $input in
 esac
 
 uuid=`cat /proc/sys/kernel/random/uuid`
-apt update
+apt-get update
 if [ ! "$(command -v v2ray)" ]; then
   echo "Installing V2Ray..."
   bash <(curl -L https://raw.githubusercontent.com/v2fly/fhs-install-v2ray/master/install-release.sh)
@@ -51,27 +51,27 @@ else
   exit
 fi
 
-if [ ! "$(command -v certbot)" ]; then
-  echo "Installing Certbot..."
-  echo -e "Y" | apt install certbot
-fi
-
-if [ "$(command -v certbot)" ]; then
-  echo "Certbot installed."
-else
-  echo "Certbot installation has failed, please check."
-  exit
-fi
-
 if [ ! "$(command -v nginx)" ]; then
   echo "Installing Nginx..."
-  echo -e "Y" | apt install nginx
+  apt-get -y install nginx
 fi
 
 if [ "$(command -v nginx)" ]; then
   echo "Nginx installed."
 else
   echo "Nginx installation has failed, please check."
+  exit
+fi
+
+if [ ! "$(command -v certbot)" ]; then
+  echo "Installing Certbot..."
+  apt-get -y install certbot
+fi
+
+if [ "$(command -v certbot)" ]; then
+  echo "Certbot installed."
+else
+  echo "Certbot installation has failed, please check."
   exit
 fi
 
