@@ -3,7 +3,7 @@
 current_user=$(whoami)
 if [ "$current_user" != "root" ]; then
   echo "Please run this script with root privileges!"
-  exit 1
+  exit
 fi
 read -p "Enter v2ray port (default: 12345):" v2rayPort
 v2rayPort=${v2rayPort:-12345}
@@ -14,8 +14,23 @@ nginxPort=${nginxPort:-443}
 read -p "Enter your domain name (required):" domainName
 if [ ! -n "$domainName" ]; then
     echo "Domain name is required!"
-    exit 1
+    exit
 fi
+read -p "Your domain name has already resolved to the IP address of this server [y/n] " input
+case $input in
+  [yY]*)
+    echo "Great! Let's continue."
+    ;;
+  [nN]*)
+    echo "Please set a DNS resolution to point the domain name to the IP address of this server."
+    echo "Run 'nslookup $domainName' to check."
+    exit
+    ;;
+  *)
+    echo "Just enter y or n, please."
+    exit
+    ;;
+esac
 uuid=`cat /proc/sys/kernel/random/uuid`
 apt update
 if [ ! "$(command -v v2ray)" ]; then
