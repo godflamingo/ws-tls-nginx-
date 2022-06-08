@@ -21,7 +21,7 @@ if [ "$(lsof -i:$v2rayPort)" -o "$(lsof -i:$nginxPort)" ]; then
 fi
 echo -e "\nThe result of 'nslookup $domainName': \n\n"
 nslookup $domainName
-read -p "Your domain name has already resolved to the IP address of this server? [y/n] " input
+read -p "Your domain name is already resolved to the IP address of this server? [y/n] " input
 case $input in
   [yY]*)
     echo -e "Great! Let's continue.\n"
