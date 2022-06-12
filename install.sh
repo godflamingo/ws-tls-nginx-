@@ -19,23 +19,19 @@ if [ "$(lsof -i:$v2rayPort)" -o "$(lsof -i:$nginxPort)" ]; then
   echo "Port $v2rayPort or $nginxPort is not available."
   exit
 fi
-echo -e "\nThe result of 'nslookup $domainName': \n\n"
-nslookup $domainName
-read -p "Your domain name is already resolved to the IP address of this server? [y/n] " input
-case $input in
-  [yY]*)
-    echo -e "Great! Let's continue.\n"
-    ;;
-  [nN]*)
-    echo "Please set a DNS resolution to point the domain name to the IP address of this server."
-    echo "Run 'nslookup $domainName' to check."
-    exit
-    ;;
-  *)
-    echo "Just enter y or n, please."
-    exit
-    ;;
-esac
+
+echo -e "\nResoving your domain name...\n"
+dns_ip=`curl -s ipget.net/?ip=$domainName`
+echo -e "Fetching your VPS ip address...\n"
+vps_ip=`curl -s https://ip.gs`
+echo -e "Your domain name is resolved to: $dns_ip\nYour VPS ip address: $vps_ip\n"
+if [ $dns_ip == $vps_ip ]; then
+  echo -e "Your domain name has already resolved to the IP address of this VPS! Let's continue.\n"
+else
+  echo "Please set a DNS resolution to resolve your domain name to the IP address of this VPS."
+  echo "Run 'nslookup $domainName' to check."
+  exit
+fi
 
 uuid=`cat /proc/sys/kernel/random/uuid`
 echo -e "Waiting for 'apt-get update'...\n"
@@ -77,7 +73,7 @@ else
 fi
 
 echo -e "Writing v2ray config...\n"
-path=`cat /dev/urandom | head -n 10 | md5sum | head -c 5`
+path=`head -n 10 /dev/urandom | md5sum | head -c $((RANDOM % 10 + 4))`
 cat>/usr/local/etc/v2ray/config.json<<EOF
 {
   "log":{
