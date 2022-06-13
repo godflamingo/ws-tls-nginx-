@@ -41,7 +41,6 @@ else
   exit
 fi
 
-uuid=`cat /proc/sys/kernel/random/uuid`
 echo -e "Waiting for 'apt-get update'...\n"
 apt-get update -qq
 if [ ! "$(command -v v2ray)" ]; then
@@ -81,6 +80,7 @@ else
 fi
 
 echo -e "Writing v2ray config...\n"
+uuid=`cat /proc/sys/kernel/random/uuid`
 path=`head -n 10 /dev/urandom | md5sum | head -c $((RANDOM % 10 + 4))`
 cat>/usr/local/etc/v2ray/config.json<<EOF
 {
