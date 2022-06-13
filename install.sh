@@ -4,13 +4,21 @@ if [ `whoami` != "root" ]; then
   echo "Please run this script with root privileges!"
   exit
 fi
-read -p "Enter v2ray port (default: 12345; Just keep the default value if there is no port conflict):" v2rayPort
+read -p "Enter v2ray port (default: 12345; Just keep the default value if there is no port conflict): " v2rayPort
 v2rayPort=${v2rayPort:-12345}
+if [[ $v2rayPort -le 0 ]] || [[ $v2rayPort -gt 65535 ]]; then
+  echo "The v2ray port value must be between 1 and 65535."
+  exit 1
+fi
 
-read -p "Enter nginx port (default: 443):" nginxPort
+read -p "Enter nginx port (default: 443): " nginxPort
 nginxPort=${nginxPort:-443}
+if [[ $nginxPort -le 0 ]] || [[ $nginxPort -gt 65535 ]]; then
+  echo "The nginx port value must be between 1 and 65535."
+  exit 1
+fi
 
-read -p "Enter your domain name (required):" domainName
+read -p "Enter your domain name (required): " domainName
 if [ ! -n "$domainName" ]; then
   echo "Domain name is required!"
   exit
