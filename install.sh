@@ -28,7 +28,7 @@ echo -e "Your domain name is resolved to: $dns_ip\nYour VPS ip address: $vps_ip\
 if [ $dns_ip == $vps_ip ]; then
   echo -e "Your domain name has already resolved to the IP address of this VPS! Let's continue.\n"
 else
-  echo "Please set a DNS resolution to resolve your domain name to the IP address of this VPS."
+  echo "Please resolve your domain name to the IP address of this VPS first, and then run this script again."
   echo "Run 'nslookup $domainName' to check."
   exit
 fi
