@@ -4,7 +4,7 @@ if [ `whoami` != "root" ]; then
   echo "Please run this script with root privileges!"
   exit
 fi
-read -p $'1. VMESS\x0a2. VLESS\x0aSelect protocol: ' protocol
+read -p $'1. VMESS\x0a2. VLESS\x0aSelect protocol (1 or 2): ' protocol
 case $protocol in
   1)
     protocol=vmess
@@ -18,14 +18,14 @@ case $protocol in
 esac
  
 read -p $'Enter v2ray port (default: 12345)\x0aJust keep the default value if there is no port conflict): ' v2rayPort
-v2rayPort=${v2rayPort:-12345}
+export v2rayPort=${v2rayPort:-12345}
 if [[ $v2rayPort -le 0 ]] || [[ $v2rayPort -gt 65535 ]]; then
   echo "The v2ray port value must be between 1 and 65535."
   exit 1
 fi
 
 read -p $'Enter nginx port (default: 443): ' nginxPort
-nginxPort=${nginxPort:-443}
+export nginxPort=${nginxPort:-443}
 if [[ $nginxPort -le 0 ]] || [[ $nginxPort -gt 65535 ]]; then
   echo "The nginx port value must be between 1 and 65535."
   exit 1
@@ -35,8 +35,6 @@ if [ "$(lsof -i:$v2rayPort)" -o "$(lsof -i:$nginxPort)" ]; then
   echo "Port $v2rayPort or $nginxPort is not available."
   exit
 fi
-export v2rayPort
-export nginxPort
 
 read -p $'Enter your domain name (required): ' domainName
 if [ ! -n "$domainName" ]; then
@@ -58,8 +56,8 @@ else
   exit
 fi
 
-echo -e "Waiting for 'apt-get update'...\n"
-apt-get update -qq
+echo -e "Run 'apt-get update'...\n"
+apt-get update
 if [ ! "$(command -v v2ray)" ]; then
   echo -e "Installing V2Ray...\n"
   bash <(curl -L https://raw.githubusercontent.com/v2fly/fhs-install-v2ray/master/install-release.sh)
@@ -74,7 +72,7 @@ fi
 
 if [ ! "$(command -v certbot)" ]; then
   echo -e "Installing Certbot...\n"
-  apt-get -yqq install certbot
+  apt-get -y install certbot
 fi
 
 if [ "$(command -v certbot)" ]; then
@@ -86,7 +84,7 @@ fi
 
 if [ ! "$(command -v nginx)" ]; then
   echo -e "Installing Nginx...\n"
-  apt-get -yqq install nginx
+  apt-get -y install nginx
 fi
 
 if [ "$(command -v nginx)" ]; then
