@@ -100,7 +100,7 @@ echo -e "Writing v2ray config...\n"
 export uuid=`cat /proc/sys/kernel/random/uuid`
 export path=`head -n 10 /dev/urandom | md5sum | head -c $((RANDOM % 10 + 4))`
 curl -sL https://raw.githubusercontent.com/windshadow233/ws-tls-nginx/main/config/v2ray_$protocol.json -o /usr/local/etc/v2ray/config.json.template
-envsubst '${v2rayPort}${path}' < /usr/local/etc/v2ray/config.json.template > /usr/local/etc/v2ray/config.json
+envsubst '${v2rayPort}${uuid}${path}' < /usr/local/etc/v2ray/config.json.template > /usr/local/etc/v2ray/config.json
 rm /usr/local/etc/v2ray/config.json.template
 
 echo -e "Fetching SSL certificates...\n"
