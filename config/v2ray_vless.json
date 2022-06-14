@@ -10,6 +10,7 @@
       "listen": "127.0.0.1",
       "protocol": "vless",
       "settings": {
+        "decryption": "none",
         "clients": [{
           "id": "$uuid"
         }]
