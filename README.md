@@ -28,3 +28,5 @@ bash <(curl -L https://raw.githubusercontent.com/windshadow233/ws-tls-nginx/main
 该脚本中途使用Let's Encrypt生成证书，需要每隔三个月续签一次。
 
 运行完成后，自动生成客户端配置链接。
+
+部分客户端软件可能会无法识别VLESS链接，此时按链接给出的配置信息手动导入即可。
