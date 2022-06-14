@@ -153,7 +153,7 @@ case $protocol in
     infoStr=`echo "{\"v\": \"2\", \"ps\": \"$domainName\", \"add\": \"$domainName\", \"port\": \"$nginxPort\", \"id\": \"$uuid\", \"aid\": \"0\", \"net\": \"ws\", \"type\": \"none\", \"host\": \"\", \"path\": \"/$path\", \"tls\": \"tls\", \"sni\": \"\"}" | base64 -w 0`
     ;;
   vless)
-    infoStr="$uuid@$domainName:$nginxPort?allowInsecure=false&path=%2F$path&security=tls&type=ws#$domainName"
+    infoStr="$uuid@$domainName:$nginxPort?encryption=none&allowInsecure=false&path=%2F$path&security=tls&type=ws#$domainName"
     ;;
 esac
 echo -e "Import the link shown below to your client software: \n\n$protocol://$infoStr"
