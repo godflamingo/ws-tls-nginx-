@@ -44,7 +44,7 @@ fi
 export domainName
 
 echo -e "\nResoving your domain name...\n"
-dns_ip=`dig A $domainName +short`
+dns_ip=`dig A $domainName +short | tail -n 1`
 echo -e "Fetching your VPS ip address...\n"
 vps_ip=`curl -s4 https://ipget.net`
 echo -e "Your domain name is resolved to: $dns_ip\nYour VPS ip address: $vps_ip\n"
