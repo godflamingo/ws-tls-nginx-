@@ -4,29 +4,46 @@ if [ `whoami` != "root" ]; then
   echo "Please run this script with root privileges!"
   exit
 fi
-read -p "Enter v2ray port (default: 12345; Just keep the default value if there is no port conflict): " v2rayPort
+read -p $'1. VMESS\x0a2. VLESS\x0aSelect protocol: ' protocol
+case $protocol in
+  1)
+    protocol=vmess
+    ;;
+  2)
+    protocol=vless
+    ;;
+  *)
+    echo "Wrong input!"
+    exit
+esac
+ 
+read -p $'Enter v2ray port (default: 12345)\x0aJust keep the default value if there is no port conflict): ' v2rayPort
 v2rayPort=${v2rayPort:-12345}
 if [[ $v2rayPort -le 0 ]] || [[ $v2rayPort -gt 65535 ]]; then
   echo "The v2ray port value must be between 1 and 65535."
   exit 1
 fi
 
-read -p "Enter nginx port (default: 443): " nginxPort
+read -p $'Enter nginx port (default: 443): ' nginxPort
 nginxPort=${nginxPort:-443}
 if [[ $nginxPort -le 0 ]] || [[ $nginxPort -gt 65535 ]]; then
   echo "The nginx port value must be between 1 and 65535."
   exit 1
 fi
 
-read -p "Enter your domain name (required): " domainName
-if [ ! -n "$domainName" ]; then
-  echo "Domain name is required!"
-  exit
-fi
 if [ "$(lsof -i:$v2rayPort)" -o "$(lsof -i:$nginxPort)" ]; then
   echo "Port $v2rayPort or $nginxPort is not available."
   exit
 fi
+export v2rayPort
+export nginxPort
+
+read -p $'Enter your domain name (required): ' domainName
+if [ ! -n "$domainName" ]; then
+  echo "Domain name is required!"
+  exit
+fi
+export domainName
 
 echo -e "\nResoving your domain name...\n"
 dns_ip=`curl -s ipget.net/?ip=$domainName`
@@ -80,57 +97,11 @@ else
 fi
 
 echo -e "Writing v2ray config...\n"
-uuid=`cat /proc/sys/kernel/random/uuid`
-path=`head -n 10 /dev/urandom | md5sum | head -c $((RANDOM % 10 + 4))`
-cat>/usr/local/etc/v2ray/config.json<<EOF
-{
-  "log":{
-    "access": "/var/log/v2ray/access.log",
-    "error": "/var/log/v2ray/error.log",
-    "loglevel": "warning"
-  },
-  "inbounds": [
-    {
-      "port": $v2rayPort,
-      "listen": "127.0.0.1",
-      "protocol": "vmess",
-      "settings": {
-        "clients": [{
-          "id": "$uuid",
-          "alterID": 0
-        }]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "wsSettings": {
-          "path": "/$path"
-        }
-      }
-    }
-  ],
-  "outbounds": [
-    {
-      "protocol": "freedom",
-      "settings": {}
-    },
-    {
-      "protocol": "blackhole",
-      "settings": {},
-      "tag": "blocked"
-    }
-  ],
-  "routing": {
-    "domainStrategy": "IPOnDemand",
-    "rules": [
-      {
-        "type": "field",
-        "protocol": ["bittorrent"],
-        "outboundTag": "blocked"
-      }
-    ]
-  }
-}
-EOF
+export uuid=`cat /proc/sys/kernel/random/uuid`
+export path=`head -n 10 /dev/urandom | md5sum | head -c $((RANDOM % 10 + 4))`
+curl -sL https://raw.githubusercontent.com/windshadow233/ws-tls-nginx/main/config/v2ray_$protocol.json -o /usr/local/etc/v2ray/config.json.template
+envsubst '${v2rayPort}${path}' < /usr/local/etc/v2ray/config.json.template > /usr/local/etc/v2ray/config.json
+rm /usr/local/etc/v2ray/config.json.template
 
 echo -e "Fetching SSL certificates...\n"
 ufw allow 80
@@ -177,5 +148,12 @@ systemctl enable v2ray
 systemctl enable nginx
 ufw allow $nginxPort
 echo -e "Finish! \nV2Ray config file is at: /usr/local/etc/v2ray/config.json\nNginx config file is at: /etc/nginx/conf.d/v2ray.conf\n"
-infoStr=`echo "{\"v\": \"2\", \"ps\": \"$domainName\", \"add\": \"$domainName\", \"port\": \"$nginxPort\", \"id\": \"$uuid\", \"aid\": \"0\", \"net\": \"ws\", \"type\": \"none\", \"host\": \"\", \"path\": \"/$path\", \"tls\": \"tls\", \"sni\": \"\"}" | base64 -w 0`
-echo -e "Import the link shown below to your client software: \n\nvmess://$infoStr"
+case $protocol in
+  vmess)
+    infoStr=`echo "{\"v\": \"2\", \"ps\": \"$domainName\", \"add\": \"$domainName\", \"port\": \"$nginxPort\", \"id\": \"$uuid\", \"aid\": \"0\", \"net\": \"ws\", \"type\": \"none\", \"host\": \"\", \"path\": \"/$path\", \"tls\": \"tls\", \"sni\": \"\"}" | base64 -w 0`
+    ;;
+  vless)
+    infoStr="$uuid@$domainName:$nginxPort?allowInsecure=false&path=%2F$path&security=tls&type=ws#$domainName"
+    ;;
+esac
+echo -e "Import the link shown below to your client software: \n\n$protocol://$infoStr"
