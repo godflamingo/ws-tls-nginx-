@@ -31,7 +31,7 @@ if [[ $nginxPort -le 0 ]] || [[ $nginxPort -gt 65535 ]]; then
   exit 1
 fi
 
-if [ "$(lsof -i:$v2rayPort)" -o "$(lsof -i:$nginxPort)" ]; then
+if [ "$(lsof -i:$v2rayPort | grep LISTEN)" -o "$(lsof -i:$nginxPort | grep LISTEN)" ]; then
   echo "Port $v2rayPort or $nginxPort is not available."
   exit
 fi
