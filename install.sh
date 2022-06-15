@@ -4,7 +4,7 @@ if [ `whoami` != "root" ]; then
   echo "Please run this script with root privileges!"
   exit
 fi
-read -p $'1. VMESS\x0a2. VLESS\x0aSelect protocol (1 or 2): ' protocol
+read -p $'Select protocol:\x0a1. VMESS\x0a2. VLESS\x0aChoose 1 or 2: ' protocol
 case $protocol in
   1)
     protocol=vmess
