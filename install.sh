@@ -101,16 +101,16 @@ curl -sL https://raw.githubusercontent.com/windshadow233/ws-tls-nginx/main/confi
 envsubst '${v2rayPort}${uuid}${path}' < /usr/local/etc/v2ray/config.json.template > /usr/local/etc/v2ray/config.json
 rm /usr/local/etc/v2ray/config.json.template
 
-echo -e "Fetching SSL certificates...\n"
+echo -e "Fetching SSL certificate...\n"
 ufw allow 80
 echo -e 'A' | certbot certonly --register-unsafely-without-email --webroot -w /var/www/html --preferred-challenges http -d $domainName
 ufw deny 80
 
 certificates=`certbot certificates | grep $domainName`
 if [ "$certificates" ]; then
-  echo -e "Certificates were installed successfully!\n"
+  echo -e "Certificate was installed successfully!\n"
 else
-  echo "Certificates installation failed, please check."
+  echo "Certificate installation failed, please check."
   exit
 fi
 
@@ -137,6 +137,12 @@ server {
   }
 }
 EOF
+
+echo -e "Downloading certificate automatic renewal script...\n"
+curl -s https://raw.githubusercontent.com/windshadow233/ws-tls-nginx/main/update-ssl.sh -o /root/update-ssl.sh
+chmod +x update-ssl.sh
+echo -e "Writing certificate automatic renewal task into /etc/crontab..."
+echo "0 0 * * * root /root/update-ssl.sh $domainName" >> /etc/crontab
 
 echo -e "Restarting all services...\n"
 systemctl daemon-reload
