@@ -94,7 +94,7 @@ else
   exit
 fi
 
-echo -e "Writing v2ray config...\n"
+echo -e "Downloading v2ray config...\n"
 export uuid=`cat /proc/sys/kernel/random/uuid`
 export path=`head -n 10 /dev/urandom | md5sum | head -c $((RANDOM % 10 + 4))`
 curl -sL https://raw.githubusercontent.com/windshadow233/ws-tls-nginx/main/config/v2ray_$protocol.json -o /usr/local/etc/v2ray/config.json.template
@@ -114,29 +114,10 @@ else
   exit
 fi
 
-echo -e "Writing nginx config...\n"
-cat>/etc/nginx/conf.d/v2ray.conf<<EOF
-server {
-  listen $nginxPort ssl;
-  ssl on;
-  ssl_certificate       /etc/letsencrypt/live/$domainName/fullchain.pem;
-  ssl_certificate_key   /etc/letsencrypt/live/$domainName/privkey.pem;
-  ssl_protocols         TLSv1 TLSv1.1 TLSv1.2;
-  ssl_ciphers           HIGH:!aNULL:!MD5;
-  server_name           $domainName;
-  location /$path {
-    proxy_redirect off;
-    proxy_pass http://127.0.0.1:$v2rayPort;
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade \$http_upgrade;
-    proxy_set_header Connection "upgrade";
-    proxy_set_header Host \$http_host;
-
-    proxy_set_header X-Real-IP \$remote_addr;
-    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-  }
-}
-EOF
+echo -e "Downloading nginx config...\n"
+curl -sL https://raw.githubusercontent.com/windshadow233/ws-tls-nginx/main/config/nginx.conf -o /etc/nginx/conf.d/v2ray.conf.template
+envsubst '${v2rayPort}${nginxPort}${domainName}${path}' < /etc/nginx/conf.d/v2ray.conf.template > /etc/nginx/conf.d/v2ray.conf
+rm /etc/nginx/conf.d/v2ray.conf.template
 
 echo -e "Downloading certificate automatic renewal script...\n"
 curl -s https://raw.githubusercontent.com/windshadow233/ws-tls-nginx/main/update-ssl.sh -o /root/update-ssl.sh
