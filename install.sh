@@ -140,7 +140,7 @@ EOF
 
 echo -e "Downloading certificate automatic renewal script...\n"
 curl -s https://raw.githubusercontent.com/windshadow233/ws-tls-nginx/main/update-ssl.sh -o /root/update-ssl.sh
-chmod +x update-ssl.sh
+chmod +x /root/update-ssl.sh
 echo -e "Writing certificate automatic renewal task into /etc/crontab..."
 echo "0 0 * * * root /root/update-ssl.sh $domainName" >> /etc/crontab
 
