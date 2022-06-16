@@ -29,7 +29,7 @@ bash <(curl -L https://raw.githubusercontent.com/windshadow233/ws-tls-nginx/main
 
 证书更新逻辑：
 1. 检查/root目录下是否存在.<span>$</span>{domainName}-expiredate文件（用以存放证书过期日期的时间戳），若存在则读取其中的时间戳，否则执行certbot获取检查过期日期并写入.<span>$</span>{domainName}-expiredate文件。
-2. 判断当前时间戳是否不小于过期时间戳，若为真，则强制更新证书并更新时间戳文件。
+2. 判断当前时间戳是否满足提前天数条件（默认在过期前5天更新，如需修改，请查看/etc/crontab修改函数参数），若为真，则强制更新证书并更新时间戳文件。
 
 运行完成后，自动生成客户端配置链接。
 
