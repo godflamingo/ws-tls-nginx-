@@ -9,7 +9,7 @@ fi
 
 today=`date +%s`
 if [ $today -ge $((expire - 86400 * $2)) ]; then
-  certbot renew --cert-name $1 --post-hook "systemctl restart nginx"
+  certbot renew --cert-name $1 --deploy-hook "nginx -s reload"
   expire=`date -d $(certbot certificates -d $1 | grep "Expiry Date" | awk '{print$3}') +%s`
   echo $expire > /root/.$1-expiredate
 fi

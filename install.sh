@@ -120,10 +120,10 @@ envsubst '${v2rayPort}${nginxPort}${domainName}${path}' < /etc/nginx/conf.d/v2ra
 rm /etc/nginx/conf.d/v2ray.conf.template
 
 echo -e "Downloading certificate automatic renewal script...\n"
-curl -s https://raw.githubusercontent.com/windshadow233/ws-tls-nginx/main/update-ssl.sh -o /root/update-ssl.sh
+curl -s https://raw.githubusercontent.com/windshadow233/ws-tls-nginx/main/renew-cert.sh -o /root/update-ssl.sh
 chmod +x /root/update-ssl.sh
 echo -e "Writing certificate automatic renewal task into /etc/crontab..."
-echo "0 0 * * * root /root/update-ssl.sh $domainName 5" >> /etc/crontab
+echo "0 0 * * * root /root/renew-cert.sh $domainName 5" >> /etc/crontab
 
 echo -e "Restarting all services...\n"
 systemctl daemon-reload
