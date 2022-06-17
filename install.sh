@@ -2,14 +2,14 @@
 
 GREEN="\033[36m"
 RED="\033[31m"
-RESET="\033[0m"
 YELLOW="\033[32m"
+RESET="\033[0m"
 
 if [ `whoami` != "root" ]; then
   echo -e "${RED}Please run this script with root privileges!${RESET}"
   exit
 fi
-read -p $'${GREEN}Select protocol:\x0a1. VMESS\x0a2. VLESS\x0aChoose 1 or 2: ${RESET}' protocol
+read -p $'\033[36mSelect protocol:\x0a1. VMESS\x0a2. VLESS\x0aChoose 1 or 2: \033[0m' protocol
 case $protocol in
   1)
     protocol=vmess
