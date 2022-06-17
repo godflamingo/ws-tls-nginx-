@@ -34,7 +34,7 @@ bash <(curl -L https://raw.githubusercontent.com/windshadow233/ws-tls-nginx/main
 1. 检查/root目录下是否存在.<span>$</span>{domainName}-expiredate文件（用以存放证书过期日期的时间戳），若存在则读取其中的时间戳，否则执行certbot获取检查过期日期并写入.<span>$</span>{domainName}-expiredate文件。
 2. 判断当前时间戳是否满足提前天数条件，若为真，则更新证书与时间戳文件。
 
-**注意：80端口将被用于以web-root的方式续约证书，故请始终确保防火墙放行该端口**
+**注意：80端口将被用于以web-root的方式续约证书，因此在选择V2Ray、Nginx端口时请避开80。**
 
 运行完成后，自动生成客户端配置链接。
 

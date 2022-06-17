@@ -105,6 +105,7 @@ rm /usr/local/etc/v2ray/config.json.template
 echo -e "\033[36mFetching SSL certificate...\n"
 ufw allow 80
 echo -e 'A' | certbot certonly --register-unsafely-without-email --webroot -w /var/www/html --preferred-challenges http -d $domainName
+ufw deny 80
 
 certificates=`certbot certificates | grep $domainName`
 if [ "$certificates" ]; then
