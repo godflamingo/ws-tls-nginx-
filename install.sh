@@ -52,7 +52,7 @@ export domainName
 echo -e "${GREEN}\nResoving your domain name...\n${RESET}"
 dns_ip=`dig A $domainName +short | tail -n 1`
 echo -e "${GREEN}Fetching your VPS ip address...\n${RESET}"
-vps_ip=`curl -s4 https://ipget.net`
+vps_ip=`curl -s4 ip.sb`
 echo -e "${GREEN}Your domain name is resolved to: $dns_ip\nYour VPS ip address: $vps_ip\n${RESET}"
 if [ $dns_ip == $vps_ip ]; then
   echo -e "${GREEN}Your domain name has already resolved to the IP address of this VPS! Let's continue.\n${RESET}"
