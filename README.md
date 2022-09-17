@@ -31,7 +31,7 @@ bash <(curl -L https://raw.githubusercontent.com/windshadow233/ws-tls-nginx/main
 该脚本中途使用Let's Encrypt生成证书，脚本会配置自动更新证书的crontab，每日零点检查证书是否将在n天以后过期，若是，则更新。（n默认为5，如需修改，请在/etc/crontab中修改函数参数，该值默认情况下不应超过30）。
 
 证书更新逻辑：
-1. 检查/root目录下是否存在.<span>$</span>{domainName}-expiredate文件（用以存放证书过期日期的时间戳），若存在则读取其中的时间戳，否则执行certbot获取检查过期日期并写入.<span>$</span>{domainName}-expiredate文件。
+1. 检查/root目录下是否存在.<span>$</span>{domainName}-expire文件（用以存放证书过期日期的时间戳），若存在则读取其中的时间戳，否则执行certbot获取检查过期日期并写入.<span>$</span>{domainName}-expire文件。
 2. 判断当前时间戳是否满足提前天数条件，若为真，则更新证书与时间戳文件。
 
 **注意：80端口将被用于以web-root的方式续约证书，因此在选择V2Ray、Nginx端口时请避开80。**
